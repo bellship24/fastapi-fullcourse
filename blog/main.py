@@ -3,10 +3,13 @@ from fastapi import FastAPI, Depends, status, Response, HTTPException
 import schemas, models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
+from hashing import Hash
 
 models.Base.metadata.create_all(engine)
 
+
 app = FastAPI()
+
 
 def get_db():
     db = SessionLocal()
@@ -44,3 +47,12 @@ def show(id, response: Response, db: Session = Depends(get_db)):
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {'detail': f"Blog with the id {id} is not available"}
     return blog
+
+
+@app.post('/user')
+def create_user(request: schemas.User, db: Session = Depends(get_db)):
+    new_user = models.User(name=request.name, email=request.email, password=Hash.bcrypt(request.password))
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 class BlogBase(BaseModel):
@@ -32,3 +32,8 @@ class ShowBlog(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class Login(BaseModel):
+    username: str
+    password: str
